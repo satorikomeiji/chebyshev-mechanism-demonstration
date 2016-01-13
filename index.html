@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000;">
+Your browser does not support the HTML5 canvas tag.
+</canvas>
+
+<script type="text/javascript">
+function animate_lambda(ctx, anglespeed) {
+
+  var jx = 200, jy = 300;
+  var cx = 400, cy = 300;
+  var count = 0;
+  var radius = 40;
+  var big_length = 800;
+  var small_length = 100;
+  function frame() {
+    var endx, endy;
+    var angle = count * interval * anglespeed;
+    endx = cx + radius * Math.cos(angle);
+    endy = cy + radius * Math.sin(angle);
+    (tx-jx)^2 + (ty - jy)^2 = small_length^2;
+    (tx-cx)^2 + (ty - cy)^2 = big_legnth^2;
+  }
+
+}
+function animate(ctx, anglespeed, canvas) {
+    var cx = 100, cy = 100;
+    var interval = 10; //interval in milliseconds
+    var count = 0;
+    var radius = 100;
+    function frame() {
+      // clear
+
+      var x,y;
+      var angle = count * interval * anglespeed;
+      x = cx + radius * Math.cos(angle);
+      y = cy + radius * Math.sin(angle);
+      ctx.clearRect(0, 0, 300, 300);
+      ctx.fillStyle = "#ff0000";
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.lineTo(x,y);
+      ctx.stroke();
+      ctx.closePath();
+      count++;
+      console.log("x = ", x, "y = ", y);
+    }
+    var id = window.setInterval(frame, interval);
+}
+var c = document.getElementById("myCanvas");
+var ctx = c.getContext("2d");
+ctx.fillStyle = "#00ffff"
+ctx.fillRect(20, 20, 150, 100);
+ctx.moveTo(0,0);
+ctx.lineTo(300,100);
+ctx.stroke();
+ctx.beginPath();
+ctx.arc(95,50,40, 0, 2 * Math.PI);
+ctx.stroke();
+var grd = ctx.createLinearGradient(0,0,200, 0);
+grd.addColorStop(0, "red");
+grd.addColorStop(0.5, "#ffef00")
+grd.addColorStop(1, "white");
+ctx.fillStyle = grd;
+ctx.fillRect(10,10,200,80);
+var circular_grd = ctx.createRadialGradient(75,50, 5, 90,60, 100);
+circular_grd.addColorStop(0,"white");
+circular_grd.addColorStop(1,"red");
+ctx.fillStyle = circular_grd;
+ctx.fillRect(10, 10, 200, 150);
+animate(ctx, Math.PI/100, c);
+</script>
+
+</body>
+</html>
