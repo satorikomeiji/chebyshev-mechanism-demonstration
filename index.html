@@ -2,7 +2,7 @@
 <html>
 <body>
 
-<canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000;">
+<canvas id="myCanvas" width="600" height="600" style="border:1px solid #000000;">
 Your browser does not support the HTML5 canvas tag.
 </canvas>
 
@@ -20,31 +20,77 @@ function animate_lambda(ctx, anglespeed) {
     var angle = count * interval * anglespeed;
     endx = cx + radius * Math.cos(angle);
     endy = cy + radius * Math.sin(angle);
-    (tx-jx)^2 + (ty - jy)^2 = small_length^2;
-    (tx-cx)^2 + (ty - cy)^2 = big_legnth^2;
   }
 
 }
 function animate(ctx, anglespeed, canvas) {
-    var cx = 100, cy = 100;
+    //l1, l2 shoulders length
+    var l1 = 100, l2 = 60;
+    //r radius
+    var r = 50;
+    //distance from the coordinate center to the tangent point
+    var dtp = Math.sqrt(l1 * l1 - l2 * l2);
+    //distance from the coordinate center to the center of rotation
+    var dto = Math.sqrt(dtp * dtp + r * r);
+    //start angle of the shoulder
+    var shoulder_angle_start = Math.asin(l2/l1) + Math.asin(r/dto);
+    //end angle of the shoulder
+    var shoulder_angle_end = Math.asin((l2-r)/dto);
+    //start angle of the circle
+    var circle_angle_start = Math.asin(dtp / dto);
+    //end angle of the circle
+    var circle_angle_end = circle_angle_start + Math.PI;
     var interval = 10; //interval in milliseconds
+    //number of framepoints
+    var np = ((Math.PI * 1000 / anglespeed) / interval);
+    //l1 shoulder angle step
+    var as1 = (shoulder_angle_start - shoulder_angle_end) / np;
+    //l2 circle angle step
+    var as2 = (circle_angle_start - circle_angle_end) / np;
+
+    var cx = 100, cy = 100;
+    var cx0 = 100, cy0 = 100;
     var count = 0;
-    var radius = 100;
+    var radius = r;
+    var current_shoulder_angle = shoulder_angle_start;
+    var current_circle_angle = circle_angle_start;
+    function drawSegmentP(ctx, p1, p2) {
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+        ctx.closePath();
+    }
+    function drawSegment(ctx, p1x, p1y, p2x, p2y) {
+        drawSegmentP(ctx, {x : p1x,
+                          y : p1y},
+                         {x : p2x,
+                          y : p2y})
+    }
     function frame() {
       // clear
-
-      var x,y;
-      var angle = count * interval * anglespeed;
-      x = cx + radius * Math.cos(angle);
-      y = cy + radius * Math.sin(angle);
       ctx.clearRect(0, 0, 300, 300);
-      ctx.fillStyle = "#ff0000";
-      ctx.beginPath();
-      ctx.moveTo(cx,cy);
-      ctx.lineTo(x,y);
-      ctx.stroke();
-      ctx.closePath();
+      ctx.fillStyle = "#ffffee";
+      //draw left shoulder
+      var px1 = cx0 + l1 * Math.cos(current_shoulder_angle),
+          py1 = cy0 - l1 * Math.sin(current_shoulder_angle);
+      drawSegment(ctx, cx0, cy0, px1, py1);
+      //draw circle segment
+      var px2 = cx0 + dto + r * Math.cos(current_circle_angle),
+          py2 = cy0 + r * Math.sin(current_circle_angle);
+      drawSegment(ctx, cx0 + dto, cy0, px2, py2);
+      //draw segment between shoulders
+      drawSegment(ctx, px1, py1, px2, py2);
+      var tas1 = Math.floor(count/np) % 2 ? -as1 : as1;
+      current_shoulder_angle += tas1;
+      current_circle_angle  += -as2;
       count++;
+      console.log("circle_angle_start", circle_angle_start);
+      console.log("circle_angle_end", circle_angle_end);
+      console.log("current_circle_angle = ", current_circle_angle);
+      console.log("dtp =" , dtp);
+      console.log("dto = ", dto);
+      console.log("px2 = " ,px2, "py2 = " , py2 );
       console.log("x = ", x, "y = ", y);
     }
     var id = window.setInterval(frame, interval);
@@ -70,7 +116,7 @@ circular_grd.addColorStop(0,"white");
 circular_grd.addColorStop(1,"red");
 ctx.fillStyle = circular_grd;
 ctx.fillRect(10, 10, 200, 150);
-animate(ctx, Math.PI/100, c);
+animate(ctx, Math.PI/2, c);
 </script>
 
 </body>
