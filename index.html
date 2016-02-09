@@ -26,9 +26,9 @@ function animate_lambda(ctx, anglespeed) {
 }
 function animate(ctx, anglespeed, canvas) {
     //l1, l2 shoulders length
-    var l1 = 100, l2 = 60;
+    var l1 = 90, l2 = 50;
     //r radius
-    var r = 30;
+    var r = 10;
     //distance from the coordinate center to the tangent point
     var dtp = Math.sqrt(l1 * l1 - l2 * l2);
     //distance from the coordinate center to the center of rotation
@@ -43,7 +43,7 @@ function animate(ctx, anglespeed, canvas) {
     var circle_angle_end = circle_angle_start + Math.PI;
     var interval = 10; //interval in milliseconds
     //number of framepoints
-    var np = ((Math.PI * 1000 / anglespeed) / interval);
+    var np = Math.floor(((Math.PI * 1000 / anglespeed) / interval));
     //l1 shoulder angle step
     var as1 = (shoulder_angle_start - shoulder_angle_end) / np;
     //l2 circle angle step
@@ -98,7 +98,11 @@ function animate(ctx, anglespeed, canvas) {
       drawSegment(ctx, cx0 + dto, cy0, px2, py2);
       //draw left shoulder
       var index =  count % np;
-      current_shoulder_angle =Math.floor(count/np) % 2 == 0 ? res1[index] : res2[index];
+      console.log("np = ", np);
+      console.log("index", index);
+      console.log("res1", res1[index]);
+      console.log("res2", res2[index]);
+      current_shoulder_angle =count < np ? res1[index] : res2[index];
       console.log("current_shoulder_angle", current_shoulder_angle);
       var px1 = cx0 + l1 * Math.cos(current_shoulder_angle),
           py1 = cy0 + l1 * Math.sin(current_shoulder_angle);
@@ -113,6 +117,7 @@ function animate(ctx, anglespeed, canvas) {
       //current_shoulder_angle += tas1;
       current_circle_angle  += as2;
       count++;
+      count = count % (2 * np);
       console.log("start angle = " , res[0]);
       console.log("end angle = ", res[np-1])
       console.log("start angle real = ", shoulder_angle_start);
@@ -148,7 +153,7 @@ circular_grd.addColorStop(0,"white");
 circular_grd.addColorStop(1,"red");
 ctx.fillStyle = circular_grd;
 ctx.fillRect(10, 10, 200, 150);
-animate(ctx, Math.PI/3, c);
+animate(ctx, Math.PI/2, c);
 </script>
 
 </body>
