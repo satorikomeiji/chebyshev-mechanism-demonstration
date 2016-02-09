@@ -5,7 +5,8 @@
 <canvas id="myCanvas" width="600" height="600" style="border:1px solid #000000;">
 Your browser does not support the HTML5 canvas tag.
 </canvas>
-
+<script src="http://numericjs.com/numeric/lib/numeric-1.2.6.js">
+</script>
 <script type="text/javascript">
 function animate_lambda(ctx, anglespeed) {
 
@@ -27,7 +28,7 @@ function animate(ctx, anglespeed, canvas) {
     //l1, l2 shoulders length
     var l1 = 100, l2 = 60;
     //r radius
-    var r = 50;
+    var r = 30;
     //distance from the coordinate center to the tangent point
     var dtp = Math.sqrt(l1 * l1 - l2 * l2);
     //distance from the coordinate center to the center of rotation
@@ -46,16 +47,33 @@ function animate(ctx, anglespeed, canvas) {
     //l1 shoulder angle step
     var as1 = (shoulder_angle_start - shoulder_angle_end) / np;
     //l2 circle angle step
-    var as2 = (circle_angle_start - circle_angle_end) / np;
+    var as2 = Math.PI / np;
+    //L
+    var L = 300;
 
-    
+
 
     var cx = 100, cy = 100;
     var cx0 = 100, cy0 = 100;
     var count = 0;
     var radius = r;
     var current_shoulder_angle = shoulder_angle_start;
-    var current_circle_angle = circle_angle_start;
+    var current_circle_angle = Math.PI - circle_angle_start;
+    var f = function(b, a) {
+      return (2 * dto *r * Math.sin(b) -2* l1 * r * Math.sin(b - a)) /
+      (2 * l1 * (dto * Math.sin(a) - r * Math.sin(b-a)));
+    }
+    var sol1 =numeric.dopri(current_circle_angle, current_circle_angle + Math.PI, shoulder_angle_start, f,1e-8, 1000);
+    var sol2 =numeric.dopri(current_circle_angle + Math.PI, current_circle_angle + 2*Math.PI, shoulder_angle_end, f,1e-8, 1000);
+    var values1 = [], values2 = [];
+    for (i = 0; i < np; i++) {
+      values1.push(current_circle_angle + i * as2);
+    }
+    for (i = 0; i < np; i++) {
+      values2.push(current_circle_angle + Math.PI + i * as2);
+    }
+    var res1 = sol1.at(values1);
+    var res2 = sol2.at(values2);
     function drawSegmentP(ctx, p1, p2) {
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
@@ -71,22 +89,34 @@ function animate(ctx, anglespeed, canvas) {
     }
     function frame() {
       // clear
-      ctx.clearRect(0, 0, 300, 300);
+      ctx.clearRect(0, 0, 400, 600);
       ctx.fillStyle = "#ffffee";
-      //draw left shoulder
-      var px1 = cx0 + l1 * Math.cos(current_shoulder_angle),
-          py1 = cy0 - l1 * Math.sin(current_shoulder_angle);
-      drawSegment(ctx, cx0, cy0, px1, py1);
+
       //draw circle segment
       var px2 = cx0 + dto + r * Math.cos(current_circle_angle),
           py2 = cy0 + r * Math.sin(current_circle_angle);
       drawSegment(ctx, cx0 + dto, cy0, px2, py2);
+      //draw left shoulder
+      var index =  count % np;
+      current_shoulder_angle =Math.floor(count/np) % 2 == 0 ? res1[index] : res2[index];
+      console.log("current_shoulder_angle", current_shoulder_angle);
+      var px1 = cx0 + l1 * Math.cos(current_shoulder_angle),
+          py1 = cy0 + l1 * Math.sin(current_shoulder_angle);
+      drawSegment(ctx, cx0, cy0, px1, py1);
       //draw segment between shoulders
       drawSegment(ctx, px1, py1, px2, py2);
-      var tas1 = Math.floor(count/np) % 2 ? -as1 : as1;
-      current_shoulder_angle += tas1;
-      current_circle_angle  += -as2;
+      var px3 = (px1 - px2) * L / l2  + px2;
+      var py3 = (py1 - py2) * L / l2 + py2;
+      drawSegment(ctx, px1, py1, px3, py3);
+      //var das1 = 5 * Math.sin(current_circle_angle - circle_angle_start) * as1;
+      //var tas1 = Math.floor(count/np) % 2 ? as1 : -as1;
+      //current_shoulder_angle += tas1;
+      current_circle_angle  += as2;
       count++;
+      console.log("start angle = " , res[0]);
+      console.log("end angle = ", res[np-1])
+      console.log("start angle real = ", shoulder_angle_start);
+
       console.log("circle_angle_start", circle_angle_start);
       console.log("circle_angle_end", circle_angle_end);
       console.log("current_circle_angle = ", current_circle_angle);
@@ -118,7 +148,7 @@ circular_grd.addColorStop(0,"white");
 circular_grd.addColorStop(1,"red");
 ctx.fillStyle = circular_grd;
 ctx.fillRect(10, 10, 200, 150);
-animate(ctx, Math.PI/2, c);
+animate(ctx, Math.PI/3, c);
 </script>
 
 </body>
