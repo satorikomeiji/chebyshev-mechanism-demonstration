@@ -25,14 +25,17 @@ function animate_lambda(ctx, anglespeed) {
 
 }
 function animate(ctx, anglespeed, canvas) {
+    //distance from center of coordinates to circle
+    var dtc = 60
     //l1, l2 shoulders length
     var l1 = 90, l2 = 50;
     //r radius
-    var r = 10;
+    var r = 20;
     //distance from the coordinate center to the tangent point
     var dtp = Math.sqrt(l1 * l1 - l2 * l2);
     //distance from the coordinate center to the center of rotation
-    var dto = Math.sqrt(dtp * dtp + r * r);
+    //var dto = Math.sqrt(dtp * dtp + r * r);
+    var dto = r + dtc;
     //start angle of the shoulder
     var shoulder_angle_start = Math.asin(l2/l1) + Math.asin(r/dto);
     //end angle of the shoulder
@@ -58,22 +61,30 @@ function animate(ctx, anglespeed, canvas) {
     var count = 0;
     var radius = r;
     var current_shoulder_angle = shoulder_angle_start;
-    var current_circle_angle = Math.PI - circle_angle_start;
+  //  var current_circle_angle = Math.PI - circle_angle_start;
+    var current_circle_angle = Math.PI;
     var f = function(b, a) {
       return (2 * dto *r * Math.sin(b) -2* l1 * r * Math.sin(b - a)) /
       (2 * l1 * (dto * Math.sin(a) - r * Math.sin(b-a)));
     }
+    var s_angle = Math.acos((l2 * l2 - dtc  * dtc - l1 * l1)/(2*dtc * l1));
+    var whole_sol = numeric.dopri(Math.PI, 3*Math.PI, Math.PI -s_angle, f,1e-8, 1000);
     var sol1 =numeric.dopri(current_circle_angle, current_circle_angle + Math.PI, shoulder_angle_start, f,1e-8, 1000);
     var sol2 =numeric.dopri(current_circle_angle + Math.PI, current_circle_angle + 2*Math.PI, shoulder_angle_end, f,1e-8, 1000);
-    var values1 = [], values2 = [];
+    var values1 = [], values2 = [], whole_values = [];
     for (i = 0; i < np; i++) {
       values1.push(current_circle_angle + i * as2);
     }
     for (i = 0; i < np; i++) {
       values2.push(current_circle_angle + Math.PI + i * as2);
     }
+
+    for (i =0; i < np * 2; i++) {
+      whole_values.push(Math.PI + i * as2);
+    }
     var res1 = sol1.at(values1);
     var res2 = sol2.at(values2);
+    var whole_res = whole_sol.at(whole_values);
     function drawSegmentP(ctx, p1, p2) {
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
@@ -102,7 +113,8 @@ function animate(ctx, anglespeed, canvas) {
       console.log("index", index);
       console.log("res1", res1[index]);
       console.log("res2", res2[index]);
-      current_shoulder_angle =count < np ? res1[index] : res2[index];
+      //current_shoulder_angle =count < np ? res1[index] : res2[index];
+      current_shoulder_angle = whole_res[count];
       console.log("current_shoulder_angle", current_shoulder_angle);
       var px1 = cx0 + l1 * Math.cos(current_shoulder_angle),
           py1 = cy0 + l1 * Math.sin(current_shoulder_angle);
