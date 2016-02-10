@@ -19,6 +19,8 @@ Your browser does not support the HTML5 canvas tag.
 <input id="l2" type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' value="50"></input>
 <h3>Длина шеста</h3>
 <input id="L" type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' value="300"></input>
+<h3>Скорость вращения</h3>
+<input id="speed" type="text" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46' value="1.57"></input>
 <div style="padding-top:1cm">
 <button type="button" onclick="change_values()">Принять</button>
 </div>
@@ -48,6 +50,7 @@ function change_values() {
   l2 = parseInt(document.getElementById('l2').value);
   L  = parseInt(document.getElementById('L').value);
   r  = parseInt(document.getElementById('r').value);
+  my_anglespeed = parseFloat(document.getElementById('speed').value);
   animate(ctx, my_anglespeed, c);
 }
 function animate_lambda(ctx, anglespeed) {
