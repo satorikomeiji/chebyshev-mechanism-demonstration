@@ -63,6 +63,7 @@ function animate(ctx, anglespeed, canvas) {
     var current_shoulder_angle = shoulder_angle_start;
   //  var current_circle_angle = Math.PI - circle_angle_start;
     var current_circle_angle = Math.PI;
+    //solve ode
     var f = function(b, a) {
       return (2 * dto *r * Math.sin(b) -2* l1 * r * Math.sin(b - a)) /
       (2 * l1 * (dto * Math.sin(a) - r * Math.sin(b-a)));
