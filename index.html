@@ -174,9 +174,6 @@ function animate(ctx, anglespeed, canvas) {
       for (i = 0; i < curve_points.length; i++) {
         drawPoint(ctx, curve_points[i].x, curve_points[i].y)
       }
-      //var das1 = 5 * Math.sin(current_circle_angle - circle_angle_start) * as1;
-      //var tas1 = Math.floor(count/np) % 2 ? as1 : -as1;
-      //current_shoulder_angle += tas1;
       current_circle_angle  += as2;
       count++;
       count = count % (2 * np);
@@ -184,25 +181,6 @@ function animate(ctx, anglespeed, canvas) {
     timer_id = window.setInterval(frame, interval);
 }
 var ctx = c.getContext("2d");
-ctx.fillStyle = "#00ffff"
-ctx.fillRect(20, 20, 150, 100);
-ctx.moveTo(0,0);
-ctx.lineTo(300,100);
-ctx.stroke();
-ctx.beginPath();
-ctx.arc(95,50,40, 0, 2 * Math.PI);
-ctx.stroke();
-var grd = ctx.createLinearGradient(0,0,200, 0);
-grd.addColorStop(0, "red");
-grd.addColorStop(0.5, "#ffef00")
-grd.addColorStop(1, "white");
-ctx.fillStyle = grd;
-ctx.fillRect(10,10,200,80);
-var circular_grd = ctx.createRadialGradient(75,50, 5, 90,60, 100);
-circular_grd.addColorStop(0,"white");
-circular_grd.addColorStop(1,"red");
-ctx.fillStyle = circular_grd;
-ctx.fillRect(10, 10, 200, 150);
 animate(ctx, Math.PI/2, c);
 </script>
 
